@@ -1,5 +1,9 @@
-name: CD - Development
-on: push
+name: CD - Production
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
 jobs:
   deploy:
     name: Deploy
