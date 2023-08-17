@@ -6,21 +6,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-
     - uses: actions/setup-node@v3
-    - name: Use Node.js 18
-      uses: actions/setup-node@v3
       with:
         node-version: 18
-    - run: npm install
-    - run: npm run build:production
-
-    - uses: actions/checkout@v3
-    - name: FTP Deploy Locaweb
-      uses: locaweb/ftp-deploy@1.0.0
+    - name: Install packages with NPM
+      run: npm install
+    - name: Build for production
+      run: npm run build:production
+    - name: Upload artifacts to be used in next job
+      if: success()
+      uses: actions/upload-artifact@v1
       with:
-        host: ${{ secrets.HOST }}
-        user: ${{ secrets.USER }}
-        password: ${{ secrets.PASS }}
-        localDir: "dist"
-        remoteDir: "web/FTP/"
+        name: deploy_dist
+        path: dist
+  ftp-deploy:
+    needs: build
+    runs-on: self-hosted
+
+    steps:
+      - name: Download artifacts created at previous job
+        if: success()
+        uses: actions/download-artifact@v1
+        with:
+          name: deploy_dist
+          path: dist
+
+      - name: FTP Deploy Locaweb
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          user: ${{ secrets.USER }}
+          password: ${{ secrets.PASS }}
+          localDir: "dist"
+          remoteDir: "web/FTP/"
+          dangerous-clean-slate: true
