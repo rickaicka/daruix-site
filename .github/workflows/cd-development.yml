@@ -21,7 +21,7 @@ jobs:
         path: dist
   ftp-deploy:
     needs: deploy
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Download artifacts created at previous job
