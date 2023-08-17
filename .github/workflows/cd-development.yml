@@ -20,7 +20,7 @@ jobs:
         name: deploy_dist
         path: dist
   ftp-deploy:
-    needs: build
+    needs: deploy
     runs-on: self-hosted
 
     steps:
